@@ -2,6 +2,7 @@ import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem import SnowballStemmer
 from nltk.corpus import stopwords
+from nltk import WordNetLemmatizer
 
 def tokenize(text, stopwords):
     res = '' 
@@ -11,10 +12,10 @@ def tokenize(text, stopwords):
         if char.isalpha() or char == ' ':
             res += char 
 
-    stemmer = SnowballStemmer(language = 'english')
+    lemmatizer = WordNetLemmatizer()
     # Stemming makes it ugly, but may be required. Not for now though.
     res = res.lower()
-    token_stream = [word for word in res.split(' ') if word not in stopwords and not word == '']
+    token_stream = [lemmatizer.lemmatize(word) for word in res.split(' ') if word not in stopwords and not word == '']
 
 
     return token_stream
