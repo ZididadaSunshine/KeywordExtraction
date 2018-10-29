@@ -54,8 +54,5 @@ class TKGExtractor():
 corpus = open('preprocessing/test.txt').readlines()
 
 extractor = TKGExtractor(corpus)
-keywords = extractor.extract_n_keywords(n = 5)
+keywords = extractor.extract_n_keywords(n = 15)
 print(keywords)
-
-text = 'i am very happy'
-print(nltk.pos_tag(text))
