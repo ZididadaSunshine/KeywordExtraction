@@ -12,11 +12,11 @@ def tokenize(text, stopwords):
         if char.isalpha() or char == ' ':
             res += char 
 
+    # Lemmatizing instead of stemming because it looks better
     lemmatizer = WordNetLemmatizer()
-    # Stemming makes it ugly, but may be required. Not for now though.
-    res = res.lower()
-    token_stream = [lemmatizer.lemmatize(word) for word in res.split(' ') if word not in stopwords and not word == '']
-
+    token_stream = res.lower()
+    token_stream = res.split(' ')
+    token_stream = [lemmatizer.lemmatize(word) for word in res if word not in stopwords and not word == '']
 
     return token_stream
 
