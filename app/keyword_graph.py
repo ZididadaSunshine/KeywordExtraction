@@ -1,12 +1,11 @@
 import networkx as nx 
 import operator
-from preprocessing import text_preprocessing as tp
-from collections import Counter
-import nltk
+from app.preprocessing.text_preprocessing import setup, get_stopwords, tokenize_corpus
+
 
 class TKGExtractor():
-
     def __init__(self, corpus):
+        setup()
         ''' Initializes a TKGExtractor object that is able to build 
             a word graph over a corpus (list of texts as strings) of texts 
             and extract keywords from the graph. 
@@ -15,8 +14,7 @@ class TKGExtractor():
          
 
     def tokenize_corpus(self, corpus):
-        stopwords = open('preprocessing/stopwords.txt').read().split(' ')
-        token_streams, token_set = tp.tokenize_corpus(corpus, stopwords)
+        token_streams, token_set = tokenize_corpus(corpus, get_stopwords())
         self.token_streams = token_streams
         self.token_set = token_set
 
@@ -46,13 +44,10 @@ class TKGExtractor():
         return [word for (word, closeness) in closeness_scores[:n]]
                 
 
+# ------ DEMO ------ #
+if __name__ == "__main__":
+    corpus = open('./app/test.txt').readlines()
 
-
-
-# ------ DEMO ------ #        
-
-corpus = open('preprocessing/test.txt').readlines()
-
-extractor = TKGExtractor(corpus)
-keywords = extractor.extract_n_keywords(n = 15)
-print(keywords)
+    extractor = TKGExtractor(corpus)
+    keywords = extractor.extract_n_keywords(n = 15)
+    print(keywords)

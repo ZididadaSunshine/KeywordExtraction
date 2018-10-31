@@ -1,0 +1,8 @@
+#API requirements
+flask
+flask-script
+flask-restplus
+
+#Keyword graph requirements
+networkx
+nltk
