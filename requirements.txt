@@ -1,8 +1,11 @@
-#API requirements
+# API requirements
 flask
 flask-script
 flask-restplus
 
-#Keyword graph requirements
+# Keyword graph requirements
 networkx
 nltk
+
+# Test
+flask_testing
