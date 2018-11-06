@@ -1,6 +1,6 @@
 import networkx as nx 
 import operator
-from app.preprocessing.text_preprocessing import setup, get_stopwords, tokenize_corpus
+from app.preprocessing.text_preprocessing import setup, get_processed_text
 
 
 class TKGExtractor():
@@ -11,10 +11,17 @@ class TKGExtractor():
             and extract keywords from the graph. 
         '''
         self.tokenize_corpus(corpus)
-         
+        
+    def _tokenize_corpus(self, corpus): 
+        token_streams = [get_processed_text(text, lemmatize=True) for text in corpus]
+        tokens_all = set() 
+        for token_stream in token_streams: 
+            tokens_all.update(set(token_stream))
+        return token_streams, tokens_all
 
     def tokenize_corpus(self, corpus):
-        token_streams, token_set = tokenize_corpus(corpus, get_stopwords())
+        
+        token_streams, token_set = self._tokenize_corpus(corpus)
         self.token_streams = token_streams
         self.token_set = token_set
 
