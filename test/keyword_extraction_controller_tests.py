@@ -14,8 +14,7 @@ class KeywordExtractionControllerTest(BaseTestCase):
                                          headers={'Authorization': 'anders'})
 
         self.assert200(response)
-        self.assertTrue(response.json == dict(keywords=list(['like', 'text'])) or
-                        response.json == dict(keywords=list(['text', 'like'])))
+        self.assertEquals(set(response.json['keywords']), {'nice', 'text', 'really', 'like'})
 
     def test_auth_invalid(self):
         response = self.test_client.post('/',

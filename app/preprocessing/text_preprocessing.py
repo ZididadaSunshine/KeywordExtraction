@@ -1,10 +1,3 @@
-# Required installs: 
-# - pip3 install contractions
-# - pip3 install nltk 
-# - - nltk.download("wordnet")
-# - - nltk.download("averaged_perceptron_tagger")
-# - pip3 install beautifulsoup
-
 import re, string, unicodedata
 import nltk
 import contractions
@@ -30,6 +23,8 @@ def adjust_contractions_dict():
 def setup():
     nltk.download('wordnet')
     nltk.download('averaged_perceptron_tagger')
+    nltk.download('punkt')
+    nltk.download('stopwords')
 
 
 def get_stopwords():
