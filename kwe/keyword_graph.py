@@ -1,6 +1,6 @@
 import networkx as nx 
 import operator
-from app.preprocessing.text_preprocessing import setup, get_processed_text
+from kwe.preprocessing.text_preprocessing import setup, get_processed_text
 
 
 class TKGExtractor():
@@ -49,12 +49,3 @@ class TKGExtractor():
         closeness_scores = sorted(closeness_scores.items(), key=operator.itemgetter(1))
         closeness_scores.reverse()
         return [word for (word, closeness) in closeness_scores[:n]]
-                
-
-# ------ DEMO ------ #
-if __name__ == "__main__":
-    corpus = open('./app/test.txt').readlines()
-
-    extractor = TKGExtractor(corpus)
-    keywords = extractor.extract_n_keywords(n = 15)
-    print(keywords)

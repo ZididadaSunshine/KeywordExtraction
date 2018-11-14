@@ -1,23 +1,23 @@
-import re, string, unicodedata
-import nltk
+import re
+import unicodedata
 import contractions
+import nltk
+import numpy as np
 from bs4 import BeautifulSoup
-from nltk import word_tokenize, sent_tokenize
-from nltk.corpus import stopwords
-from nltk.stem import SnowballStemmer, WordNetLemmatizer
-import json 
 from gensim.models import KeyedVectors
 from gensim.test.utils import datapath
-import numpy as np
-import pandas as pd 
+from nltk import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import SnowballStemmer, WordNetLemmatizer
 
-def adjust_contractions_dict(): 
+
+def adjust_contractions_dict():
     to_add = {}
-    for key, value in contractions.contractions_dict.items(): 
-        if "I" in key: 
-            to_add[key.lower()] = value 
+    for key, value in contractions.contractions_dict.items():
+        if "I" in key:
+            to_add[key.lower()] = value
 
-    for key, value in to_add.items(): 
+    for key, value in to_add.items():
         contractions.contractions_dict[key] = value.lower()
 
 def setup():
@@ -54,7 +54,7 @@ def cleanup_text(text):
     text = replace_contractions(text)
     return text
 
-# --- Text normalization --- # 
+# --- Text normalization --- #
 def remove_non_ascii(words):
     """Remove non-ASCII characters from list of tokenized words"""
     new_words = []
@@ -97,7 +97,7 @@ def normalize(words):
     return words
 
 # --- Post-normalization processing --- #
-def is_negation(word): 
+def is_negation(word):
     return re.match(r"""
             never|no|nothing|nowhere|noone|
             none|not|havent|hasnt|hadnt|
@@ -107,45 +107,45 @@ def is_negation(word):
             n't
             """, word)
 
-def is_punctuation(word): 
+def is_punctuation(word):
     return re.match(r'\.|:|;|!|\?', word)
 
-def negate_words(text): 
+def negate_words(text):
     """ Appends "_NEG" to all words following a negating word until a punctuation mark is met. """
     result = []
     do_negate = False
 
-    for word in text: 
+    for word in text:
         # Check if the negation state should be changed
         if is_negation(word):
-            do_negate = True 
+            do_negate = True
             result.append(word)
-        elif is_punctuation(word): 
+        elif is_punctuation(word):
             do_negate = False
             result.append(word)
-        else: 
-            if do_negate: 
+        else:
+            if do_negate:
                 result.append(f'{word}_NEG')
-            else: 
-                result.append(word) 
-    
+            else:
+                result.append(word)
+
     return result
 
-def words_to_word2vec(words, word2vec_model): 
+def words_to_word2vec(words, word2vec_model):
     result = []
-    for word in words: 
-        try: 
-            if '_NEG' in word: 
+    for word in words:
+        try:
+            if '_NEG' in word:
                 result.append( np.append(word2vec_model[word.replace('_NEG', '')], [1]) )
-            else: 
+            else:
                 result.append( np.append(word2vec_model[word], [0]) )
-        except: 
+        except:
             continue
 
     return result
-        
 
-def get_processed_text(text, negate = False, stem = False, lemmatize = False, as_word2vec = False): 
+
+def get_processed_text(text, negate = False, stem = False, lemmatize = False, as_word2vec = False):
     """ 
     Returns a list of tokens after processing the text by: 
     1. Removing HTML and Twitter handles
@@ -158,8 +158,8 @@ def get_processed_text(text, negate = False, stem = False, lemmatize = False, as
     
     If as_word2vec is set to True, returns a list of 301-d vectors (the last element is 1 if the word is negated, 0 otherwise). """
     adjust_contractions_dict()
-    word2vec = None 
-    if as_word2vec: 
+    word2vec = None
+    if as_word2vec:
         # Requires that the word2vec.bin file is in the gensim subdiretory of the Python directory.
         print('Loading word2vec...')
         word2vec = KeyedVectors.load_word2vec_format(datapath('word2vec.bin'), binary = True)
@@ -167,18 +167,15 @@ def get_processed_text(text, negate = False, stem = False, lemmatize = False, as
     text = cleanup_text(text)
     words = word_tokenize(text)
     words = normalize(words)
-    if negate: 
+    if negate:
         words = negate_words(words)
     words = remove_stopwords(words)
     words = remove_punctuation(words)
-    if stem: 
+    if stem:
         words = stem_words(words)
-    if lemmatize: 
+    if lemmatize:
         words = lemmatize_verbs(words)
-    if as_word2vec: 
+    if as_word2vec:
         words = words_to_word2vec(words, word2vec)
 
     return words
-
-
-# TEST 
