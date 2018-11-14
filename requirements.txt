@@ -1,18 +1,5 @@
-# API requirements
-flask
-flask-script
-flask-restplus
-
-# Keyword graph requirements
-networkx
-
-# Preproccesing
-contractions
-# beautifulsoup <--- Install using pip2
-bs4
-nltk
 gensim
-pandas
-
-# Test
-flask_testing
+beautifulsoup4
+numpy
+nltk
+contractions
