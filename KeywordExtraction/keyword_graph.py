@@ -1,6 +1,6 @@
 import networkx as nx 
 import operator
-from kwe.preprocessing.text_preprocessing import setup, get_processed_text
+from KeywordExtraction.preprocessing.text_preprocessing import setup, get_processed_text
 
 
 class TKGExtractor():
