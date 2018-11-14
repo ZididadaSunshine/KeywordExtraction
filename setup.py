@@ -14,6 +14,6 @@ setup(
                       'numpy',
                       'nltk',
                       'contractions'],
-    author_email='',
+    author_email='sw704e18@cs.aau.dk',
     description=''
 )
