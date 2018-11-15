@@ -1,18 +1,16 @@
 import re
 import unicodedata
+
 import contractions
 import nltk
-import numpy as np
 from bs4 import BeautifulSoup
-from gensim.models import KeyedVectors
-from gensim.test.utils import datapath
-from nltk import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer, WordNetLemmatizer
 
 
 def adjust_contractions_dict():
     to_add = {}
+
     for key, value in contractions.contractions_dict.items():
         if "I" in key:
             to_add[key.lower()] = value
@@ -20,15 +18,13 @@ def adjust_contractions_dict():
     for key, value in to_add.items():
         contractions.contractions_dict[key] = value.lower()
 
+
 def setup():
     nltk.download('wordnet')
     nltk.download('averaged_perceptron_tagger')
     nltk.download('punkt')
     nltk.download('stopwords')
 
-
-def get_stopwords():
-    return open('./app/preprocessing/STOPWORDS.txt').read().split(' ')
 
 def is_valid_phrase(x, y):
     # Allowed combinations:
@@ -45,107 +41,100 @@ def strip_html(text):
     soup = BeautifulSoup(text, "html.parser")
     return soup.get_text()
 
+
 def replace_contractions(text):
     return contractions.fix(text)
 
+
 def cleanup_text(text):
-    text = re.sub(r'(@[A-Za-z0-9]+)|(\w+:\/\/\S+)','', text) # Remove Twitter handles, tags
     text = strip_html(text)
     text = replace_contractions(text)
     return text
 
+
 # --- Text normalization --- #
-def remove_non_ascii(words):
-    """Remove non-ASCII characters from list of tokenized words"""
-    new_words = []
-    for word in words:
-        new_word = unicodedata.normalize('NFKD', word).encode('ascii', 'ignore').decode('utf-8', 'ignore')
-        new_words.append(new_word)
-    return new_words
-
-def to_lowercase(words):
-    """Convert all characters to lowercase from list of tokenized words"""
-    return [word.lower() for word in words]
-
 def remove_punctuation(words):
     """Remove punctuation from list of tokenized words"""
-    new_words = []
+    result = []
+
     for word in words:
-        new_word = re.sub(r'[^\w\s]', '', word)
-        if new_word != '' and new_word != "_NEG":
-            new_words.append(new_word)
-    return new_words
+        word = re.sub(r'[^\w\s]', '', word)
+        if word != '' and word != "_NEG":
+            result.append(word)
+
+    return result
+
 
 def remove_stopwords(words):
-    """Remove stop words from list of tokenized words"""
+    """Remove stopwords from list of tokenized words"""
     return [word for word in words if word not in stopwords.words('english')]
+
 
 def stem_words(words):
     """Stem words in list of tokenized words"""
-    stemmer = SnowballStemmer(language = 'english')
+    stemmer = SnowballStemmer(language='english')
     return [stemmer.stem(word) for word in words]
+
 
 def lemmatize_verbs(words):
     """Lemmatize verbs in list of tokenized words"""
     lemmatizer = WordNetLemmatizer()
-    lemmas = []
     return [lemmatizer.lemmatize(word, pos='v') for word in words]
 
+
 def normalize(words):
-    words = remove_non_ascii(words)
-    words = to_lowercase(words)
-    return words
+    """Remove non-ASCII characters from and lowercase tokenized words"""
+    result = []
+
+    for word in words:
+        # Ignore words containing a number
+        if any(char.isdigit() or not char.isalpha() for char in word):
+            continue
+
+        # Ignore words with more than 2 consecutive characters
+        if re.match(r'\S*((.)\2{2,})\S*', word):
+            continue
+
+        # Remove non-ASCII characters
+        word = unicodedata.normalize('NFKD', word).encode('ascii', 'ignore').decode('utf-8', 'ignore')
+
+        # Lowercase the word
+        word = word.lower()
+
+        result.append(word)
+
+    return result
+
 
 # --- Post-normalization processing --- #
 def is_negation(word):
-    return re.match(r"""
-            never|no|nothing|nowhere|noone|
-            none|not|havent|hasnt|hadnt|
-            cant|couldnt|shouldnt|wont|
-            wouldnt|dont|doesnt|didnt|
-            isnt|arent|aint|
-            n't
-            """, word)
+    return re.match(r'never|no|nothing|nowhere|noone|'
+                    r'none|not|havent|hasnt|hadnt|'
+                    r'cant|couldnt|shouldnt|wont|wouldnt|'
+                    r'dont|doesnt|didnt|isnt|arent|aint|n\'t', word)
+
 
 def is_punctuation(word):
-    return re.match(r'\.|:|;|!|\?', word)
+    return re.match(r'[.:;!?]', word)
 
-def negate_words(text):
+
+def negate_words(words):
     """ Appends "_NEG" to all words following a negating word until a punctuation mark is met. """
-    result = []
     do_negate = False
 
-    for word in text:
+    for i, word in enumerate(words):
         # Check if the negation state should be changed
         if is_negation(word):
             do_negate = True
-            result.append(word)
         elif is_punctuation(word):
             do_negate = False
-            result.append(word)
         else:
             if do_negate:
-                result.append(f'{word}_NEG')
-            else:
-                result.append(word)
-
-    return result
-
-def words_to_word2vec(words, word2vec_model):
-    result = []
-    for word in words:
-        try:
-            if '_NEG' in word:
-                result.append( np.append(word2vec_model[word.replace('_NEG', '')], [1]) )
-            else:
-                result.append( np.append(word2vec_model[word], [0]) )
-        except:
-            continue
-
-    return result
+                words[i] = f'{word}_NEG'
+    return words
 
 
-def get_processed_text(text, negate = False, stem = False, lemmatize = False, as_word2vec = False):
+def get_processed_text(text, negate=False, stem=False, no_stopwords=False, lemmatize=False):
     """ 
     Returns a list of tokens after processing the text by: 
     1. Removing HTML and Twitter handles
@@ -154,28 +143,28 @@ def get_processed_text(text, negate = False, stem = False, lemmatize = False, as
     4. Negating words following a negation if so chosen
     5. Removing stopwords
     6. Removing punctutation
-    7. Stemming or lemmatizing if so chosen
-    
-    If as_word2vec is set to True, returns a list of 301-d vectors (the last element is 1 if the word is negated, 0 otherwise). """
+    7. Stemming or lemmatizing if so chosen"""
+
     adjust_contractions_dict()
-    word2vec = None
-    if as_word2vec:
-        # Requires that the word2vec.bin file is in the gensim subdiretory of the Python directory.
-        print('Loading word2vec...')
-        word2vec = KeyedVectors.load_word2vec_format(datapath('word2vec.bin'), binary = True)
 
     text = cleanup_text(text)
-    words = word_tokenize(text)
+
+    words = text.split()
+
     words = normalize(words)
+
     if negate:
         words = negate_words(words)
-    words = remove_stopwords(words)
+
     words = remove_punctuation(words)
+
+    if no_stopwords:
+        words = remove_stopwords(words)
+
     if stem:
         words = stem_words(words)
+
     if lemmatize:
         words = lemmatize_verbs(words)
-    if as_word2vec:
-        words = words_to_word2vec(words, word2vec)
 
     return words
