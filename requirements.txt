@@ -3,3 +3,4 @@ beautifulsoup4
 numpy
 nltk
 contractions
+networkx

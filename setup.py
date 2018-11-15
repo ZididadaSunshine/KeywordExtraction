@@ -13,7 +13,8 @@ setup(
                       'beautifulsoup4',
                       'numpy',
                       'nltk',
-                      'contractions'],
+                      'contractions',
+                      'networkx'],
     author_email='sw704e18@cs.aau.dk',
     description=''
 )
