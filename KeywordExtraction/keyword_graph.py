@@ -1,11 +1,10 @@
 import networkx as nx 
 import operator
-from KeywordExtraction.preprocessing.text_preprocessing import setup, get_processed_text
+from KeywordExtraction.preprocessing.text_preprocessing import get_processed_text
 
 
 class TKGExtractor():
     def __init__(self, corpus):
-        setup()
         ''' Initializes a TKGExtractor object that is able to build 
             a word graph over a corpus (list of texts as strings) of texts 
             and extract keywords from the graph. 
