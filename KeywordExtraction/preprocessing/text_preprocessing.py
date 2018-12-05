@@ -20,7 +20,6 @@ def adjust_contractions_dict():
 
 
 def setup():
-    nltk.download('wordnet')
     nltk.download('averaged_perceptron_tagger')
     nltk.download('punkt')
     nltk.download('stopwords')
