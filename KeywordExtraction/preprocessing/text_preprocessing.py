@@ -19,12 +19,6 @@ def adjust_contractions_dict():
         contractions.contractions_dict[key] = value.lower()
 
 
-def setup():
-    nltk.download('averaged_perceptron_tagger')
-    nltk.download('punkt')
-    nltk.download('stopwords')
-
-
 def is_valid_phrase(x, y):
     # Allowed combinations:
     # - RB, JJ  -> Adverb describing a adjective, e.g. "completely shitty"
