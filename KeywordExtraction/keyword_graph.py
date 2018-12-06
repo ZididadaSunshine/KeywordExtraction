@@ -10,6 +10,7 @@ class TKGExtractor():
             and extract keywords from the graph. 
         '''
         print(f'--------- INITIALIZING KEYWORD EXTRACTION -----------')
+
         self.tokenize_corpus(corpus)
         print(f'TKGExtractor instance created with the following corpus properties: ')
         print(f'    - Number of documents: {len(corpus)}')
@@ -21,7 +22,7 @@ class TKGExtractor():
         
     def _tokenize_corpus(self, corpus): 
         print(f'Tokenizing...')
-        token_streams = [get_processed_text(text, lemmatize=True) for text in corpus]
+        token_streams = [get_processed_text(text, lemmatize=True, no_stopwords=True) for text in corpus]
         print(f'Preprocessing completed, received token streams.')
         tokens_all = set()
         for token_stream in token_streams: 
