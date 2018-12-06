@@ -10,7 +10,7 @@ class TKGExtractor():
             and extract keywords from the graph. 
         '''
         print(f'--------- INITIALIZING KEYWORD EXTRACTION -----------')
-        t_stream, t_all = self.tokenize_corpus(corpus)
+        self.tokenize_corpus(corpus)
         print(f'TKGExtractor instance created with the following corpus properties: ')
         print(f'    - Number of documents: {len(corpus)}')
         num_words = [len(post) for post in corpus]
@@ -18,7 +18,6 @@ class TKGExtractor():
         print(f'    - Total words: {sum_words}')
         avg_words = sum_words / len(corpus)
         print(f'    - Avg. post length: {avg_words}')
-        print(f'    - Number of unique words: {len(t_all)}')
         
     def _tokenize_corpus(self, corpus): 
         print(f'Tokenizing...')
@@ -27,11 +26,15 @@ class TKGExtractor():
         tokens_all = set()
         for token_stream in token_streams: 
             tokens_all.update(set(token_stream))
+
         return token_streams, tokens_all
 
     def tokenize_corpus(self, corpus):
         
         token_streams, token_set = self._tokenize_corpus(corpus)
+        print(f'    - Number of unique words: {len(token_set)}')
+
+
         self.token_streams = token_streams
         self.token_set = token_set
 
