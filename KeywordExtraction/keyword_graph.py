@@ -1,7 +1,7 @@
 import networkx as nx 
 import operator
 from KeywordExtraction.preprocessing.text_preprocessing import get_processed_text
-
+import nltk
 
 class TKGExtractor():
     def __init__(self, corpus):
@@ -15,7 +15,7 @@ class TKGExtractor():
         avg_words = sum_words / len(corpus)
         
     def _tokenize_corpus(self, corpus):
-        token_streams = [get_processed_text(text, lemmatize=True, no_stopwords=True, no_verbs=True) for text in corpus]
+        token_streams = [get_processed_text(text, lemmatize=True, no_stopwords=True) for text in corpus]
         tokens_all = set()
         for token_stream in token_streams: 
             tokens_all.update(set(token_stream))
@@ -51,4 +51,7 @@ class TKGExtractor():
         closeness_scores = nx.closeness_centrality(graph)
         closeness_scores = sorted(closeness_scores.items(), key=operator.itemgetter(1))
         closeness_scores.reverse()
-        return [word for (word, closeness) in closeness_scores[:n]]
+        tagged_words = nltk.pos_tag([word for (word, closeness) in closeness_scores[:n]])
+        nouns_adjs = [word for word, tag in tagged_words if ('NN' in tag) or ('JJ' in tag)]
+        return nouns_adjs[:n]
+        
