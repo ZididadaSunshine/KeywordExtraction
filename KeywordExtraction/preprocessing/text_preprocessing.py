@@ -126,8 +126,13 @@ def negate_words(words):
                 words[i] = f'{word}_NEG'
     return words
 
+def remove_verbs(words): 
+    # Remove verbs
+    words = nltk.pos_tag(words)
+    return [word for word, tag in words if 'VB' not in tag]
+    
 
-def get_processed_text(text, negate=False, stem=False, no_stopwords=False, lemmatize=False):
+def get_processed_text(text, negate=False, stem=False, no_stopwords=False, lemmatize=False, no_verbs=False):
     """ 
     Returns a list of tokens after processing the text by: 
     1. Removing HTML and Twitter handles
@@ -159,5 +164,8 @@ def get_processed_text(text, negate=False, stem=False, no_stopwords=False, lemma
 
     if lemmatize:
         words = lemmatize_verbs(words)
+
+    if no_verbs: 
+        words = remove_verbs(words)
 
     return words

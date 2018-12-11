@@ -15,7 +15,7 @@ class TKGExtractor():
         avg_words = sum_words / len(corpus)
         
     def _tokenize_corpus(self, corpus):
-        token_streams = [get_processed_text(text, lemmatize=True, no_stopwords=True) for text in corpus]
+        token_streams = [get_processed_text(text, lemmatize=True, no_stopwords=True, no_verbs=True) for text in corpus]
         tokens_all = set()
         for token_stream in token_streams: 
             tokens_all.update(set(token_stream))
