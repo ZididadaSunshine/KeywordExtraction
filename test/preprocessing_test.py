@@ -61,5 +61,11 @@ class PreprocessingTestCase(unittest.TestCase):
         res = get_processed_text(string, no_stopwords=True, lemmatize=True, negate=True)
         self.assertListEqual(res, expected)
 
+    def test_triple_repeated_letter(self):
+        string = "this sentence has a worrrd with three repeated letters in it".split(' ')
+        expected = "this sentence has a with three repeated letters in it".split(' ')
+        res = normalize(string)
+        self.assertListEqual(res, expected)
+
 if __name__ == '__main__':
     unittest.main()
