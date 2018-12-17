@@ -46,12 +46,11 @@ class TKGExtractor():
 
         return graph
 
-    def extract_n_keywords(self, n = 5):
+    def extract_n_keywords(self, n=10):
         graph = self.build_graph()
         closeness_scores = nx.closeness_centrality(graph)
         closeness_scores = sorted(closeness_scores.items(), key=operator.itemgetter(1))
         closeness_scores.reverse()
-        tagged_words = nltk.pos_tag([word for (word, closeness) in closeness_scores[:n]])
-        nouns_adjs = [word for word, tag in tagged_words if ('NN' in tag) or ('JJ' in tag)]
-        return nouns_adjs[:n]
-        
+        words = [word for word, score in closeness_scores]
+        return words[:n]
+
