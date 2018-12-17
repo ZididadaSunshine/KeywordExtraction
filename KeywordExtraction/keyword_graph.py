@@ -36,7 +36,7 @@ class TKGExtractor():
             # Create shingles for conducting all-neighbour-edging
             shingles = [token_stream[i : i + 5] for i  in range(0, len(token_stream) - 4)]
 
-            # Conducting 3-neighbour-edging. For every token, we add
+            # Conducting 4-neighbour-edging. For every token, we add
             # an edge between it and each the 3 following words.
             # Equal weighting, so all edges have the same weight. 
             for shingle in shingles: 
@@ -48,7 +48,7 @@ class TKGExtractor():
 
     def extract_n_keywords(self, n=10):
         graph = self.build_graph()
-        closeness_scores = nx.closeness_centrality(graph)
+        closeness_scores = nx.pagerank(graph)
         closeness_scores = sorted(closeness_scores.items(), key=operator.itemgetter(1))
         closeness_scores.reverse()
         words = [word for word, score in closeness_scores]
