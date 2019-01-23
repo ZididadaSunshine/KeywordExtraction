@@ -75,13 +75,21 @@ def lemmatize_verbs(words):
     return [lemmatizer.lemmatize(word, pos='v') for word in words]
 
 
+def endswith_punctuation(word):
+    if len(word) > 1:
+        if is_punctuation(word[len(word) - 1]):
+            return True
+
+    return False
+
+
 def normalize(words):
     """Remove non-ASCII characters from and lowercase tokenized words"""
     result = []
 
     for word in words:
         # Ignore words containing a number
-        if any(char.isdigit() or not char.isalpha() for char in word):
+        if any(char.isdigit() for char in word):
             continue
 
         # Ignore words with more than 2 consecutive characters
@@ -94,7 +102,11 @@ def normalize(words):
         # Lowercase the word
         word = word.lower()
 
-        result.append(word)
+        if endswith_punctuation(word):
+            result.append(word[:len(word) - 1])
+            result.append(word[len(word) - 1])
+        else:
+            result.append(word)
 
     return result
 
@@ -108,7 +120,7 @@ def is_negation(word):
 
 
 def is_punctuation(word):
-    return re.match(r'[.:;!?]', word)
+    return re.match(r'[.:;!?,]', word)
 
 
 def negate_words(words):

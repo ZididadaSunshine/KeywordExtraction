@@ -56,14 +56,20 @@ class PreprocessingTestCase(unittest.TestCase):
         self.assertListEqual(res, expected)
 
     def test_get_processed_text(self):
-        string = "This is a test text . It contains some <div>HTML<div> , some punctuation , doesn't have contractions , and some."
-        expected = "test text contain html punctuation have_NEG contractions_NEG and_NEG".split(' ')
+        string = "This is a test text. It contains some <div>HTML<div>, some punctuation, doesn't have contractions, and some."
+        expected = "test text contain html punctuation have_NEG contractions_NEG".split(' ')
         res = get_processed_text(string, no_stopwords=True, lemmatize=True, negate=True)
         self.assertListEqual(res, expected)
 
     def test_triple_repeated_letter(self):
         string = "this sentence has a worrrd with three repeated letters in it".split(' ')
         expected = "this sentence has a with three repeated letters in it".split(' ')
+        res = normalize(string)
+        self.assertListEqual(res, expected)
+
+    def test_split_punctuation_normalize(self):
+        string = "this is the string that should be split, at the comma.".split(' ')
+        expected = "this is the string that should be split , at the comma .".split(' ')
         res = normalize(string)
         self.assertListEqual(res, expected)
 
