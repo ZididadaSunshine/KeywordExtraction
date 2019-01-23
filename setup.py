@@ -4,7 +4,7 @@ from setuptools import find_packages
 
 setup(
     name='KeywordExtraction',
-    version='1.6',
+    version='1.7',
     packages=find_packages(),
     url='https://github.com/ZididadaSunshine/KeywordExtraction',
     license='',
